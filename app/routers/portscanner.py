@@ -21,5 +21,4 @@ def scan_port(request:PortScanRequest,background_task:BackgroundTasks):
       "result":None
    }
    background_task.add_task(run_and_store,task_id,request.target,request.start_port,request.end_port)
-   
    return {"task_id": task_id}
