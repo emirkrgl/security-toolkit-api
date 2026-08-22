@@ -8,8 +8,8 @@ from app.core.database import SessionLocal
 from sqlalchemy.orm import Session
 import json
 router=APIRouter()
-@router.get("/scan/status/{task_id}")
 
+@router.get("/scan/status/{task_id}")
 def get_status(task_id:str,db:Session=Depends(get_db)):
    a=db.query(ScanResult).filter(ScanResult.task_id==task_id).first()
    if a:
