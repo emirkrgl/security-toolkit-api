@@ -16,4 +16,9 @@ class User(Base):
     id=Column(Integer,primary_key=True,index=True)
     username=Column(String,nullable=False,unique=True)
     hashed_password=Column(String,nullable=False)
-    
+
+class BlacklistedToken(Base):
+    __tablename__ = "blacklisted_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True)

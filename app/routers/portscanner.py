@@ -7,6 +7,7 @@ from app.models.db_models import ScanResult
 from app.core.database import SessionLocal
 from sqlalchemy.orm import Session
 import json
+from app.core.security import get_current_user
 router=APIRouter()
 
 @router.get("/scan/status/{task_id}")
@@ -26,7 +27,7 @@ def run_and_store(task_id, target, start_port, end_port):
    db.close()
 
 @router.post("/scan/port")
-def scan_port(request:PortScanRequest,background_task:BackgroundTasks,db:Session=Depends(get_db)):
+def scan_port(request:PortScanRequest,background_task:BackgroundTasks,db:Session=Depends(get_db),current_user: str = Depends(get_current_user)):
    
    task_id=str(uuid.uuid4())
    yeni_nesne=ScanResult(task_id=task_id, tool="port_scanner", target=request.target, status="running", result=None)
