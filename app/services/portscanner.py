@@ -62,7 +62,7 @@ def run(target, start_port, end_port, connect_timeout=0.5, response_timeout=1.5,
     try:
         futures = []
         results = []
-        socket.gethostbyname(target)  # verilen domain adresini ip adresine çeviren fonksiyon
+        socket.gethostbyname(target)  
         with ThreadPoolExecutor(max_workers=10) as executor:
             for port in range(start_port, end_port):
                 sonuc = executor.submit(
