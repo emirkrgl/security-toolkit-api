@@ -2,12 +2,12 @@ from fastapi import APIRouter,BackgroundTasks,Depends
 from app.services.portscanner import run
 from app.models.portscanner import PortScanRequest
 import uuid
-from app.core.database import get_db
+from app.core.database import get_db,SessionLocal
 from app.models.db_models import ScanResult
-from app.core.database import SessionLocal
 from sqlalchemy.orm import Session
 import json
 from app.core.security import get_current_user
+
 router=APIRouter()
 
 @router.get("/scan/status/{task_id}")
@@ -16,7 +16,7 @@ def get_status(task_id:str,db:Session=Depends(get_db)):
    if a:
       return {"status":a.status,"result":json.loads(a.result) if a.result else None}
    else:
-      return {"error":"Bu task_id ile eşleşen bir işlem bulunamadı."}
+      return {"error":"No operation matching this task_id was found."}
    
 def run_and_store(task_id, target, start_port, end_port):
    db=SessionLocal()
@@ -27,7 +27,11 @@ def run_and_store(task_id, target, start_port, end_port):
    db.close()
 
 @router.post("/scan/port")
-def scan_port(request:PortScanRequest,background_task:BackgroundTasks,db:Session=Depends(get_db),current_user: str = Depends(get_current_user)):
+def scan_port(request:PortScanRequest,
+              background_task:BackgroundTasks,
+              db:Session=Depends(get_db),
+              current_user: str = Depends(get_current_user)
+              ):
    
    task_id=str(uuid.uuid4())
    yeni_nesne=ScanResult(task_id=task_id, tool="port_scanner", target=request.target, status="running", result=None)

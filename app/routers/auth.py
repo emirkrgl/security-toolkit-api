@@ -3,15 +3,16 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.db_models import User
 from app.models.user import UserCreate
-from app.core.security import hash_password
-from app.core.security import verify_password, create_access_token
+from app.core.security import hash_password,verify_password, create_access_token,oauth2_scheme,get_current_user
 from app.models.db_models import BlacklistedToken
 from fastapi.security import OAuth2PasswordRequestForm
-from app.core.security import oauth2_scheme
 
 router=APIRouter()
+
 @router.post("/auth/register")
-def register_user(request:UserCreate,db:Session=Depends(get_db)):
+def register_user(request:UserCreate,
+                  db:Session=Depends(get_db)
+                  ):
     existing_user=db.query(User).filter(User.username==request.username).first()
     if existing_user:
         raise HTTPException(status_code=400,detail="Username already exists.")
@@ -21,8 +22,8 @@ def register_user(request:UserCreate,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return {"message":"User created successfully."}
-@router.post("/auth/login")
 
+@router.post("/auth/login")
 def login_user(
     request: OAuth2PasswordRequestForm = Depends(), 
     db: Session = Depends(get_db)
@@ -38,7 +39,9 @@ def login_user(
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/auth/logout")
-def logout_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def logout_user(token: str = Depends(oauth2_scheme), 
+                db: Session = Depends(get_db)
+                ):
     
     already_blacklisted = db.query(BlacklistedToken).filter(BlacklistedToken.token == token).first()
     
@@ -51,3 +54,13 @@ def logout_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_d
     db.commit()
     
     return {"message": "User logged out successfully."}
+
+@router.get("/auth/me")
+def read_current_user(current_user: User = Depends(get_current_user)):
+    return {"id": current_user.id, "username": current_user.username}
+
+@router.delete("/auth/delete")
+def delete_user(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db.delete(current_user)
+    db.commit()
+    return {"message": "User deleted successfully."}

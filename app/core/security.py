@@ -7,6 +7,7 @@ from app.core.config import SECRET_KEY
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.db_models import BlacklistedToken,User
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -50,5 +51,4 @@ def get_current_user(token: str = Depends(oauth2_scheme),db: Session = Depends(g
     if user is None:
         raise credentials_exception
         
-    
     return user

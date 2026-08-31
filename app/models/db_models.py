@@ -1,6 +1,7 @@
 from sqlalchemy import Column,Integer,String,DateTime
 from app.core.database import Base
 from datetime import datetime,timezone
+
 class ScanResult(Base):
     __tablename__="toolkit"
     id=Column(Integer,primary_key=True,index=True)
